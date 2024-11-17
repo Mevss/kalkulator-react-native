@@ -1,271 +1,200 @@
-import React, { Component } from 'react';
-import { StyleSheet, TouchableOpacity, Text, View } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from "react-native";
+import SplashScreen from "./SplashScreenView";
+import Mexp from "math-expression-evaluator";
 
-class Calculator extends Component {
-  state = {
-    display: '0',
-    firstNumber: '',
-    operation: null,
-    waitingForSecondNumber: false
-  };
+const ButtonComponent = ({ title, onPress, disabled, backgroundColor, borderColor, color }) => (
+  <TouchableOpacity 
+    style={[styles.button, { backgroundColor, borderColor }]}
+    onPress={!disabled ? onPress : null}
+    disabled={disabled}
+    activeOpacity={0.7}
+  >
+    <Text style={[styles.buttonText, { color: disabled ? "gray" : color }]}>
+      {title}
+    </Text>
+  </TouchableOpacity>
+);
 
-  handleNumberPress = (number) => {
-    const { display, waitingForSecondNumber } = this.state;
+const App = () => {
+  const [input, setInput] = useState("0");
+  const [dimensions, setDimensions] = useState(Dimensions.get("window"));
+  const [isLoading, setIsLoading] = useState(true);
 
-    if (waitingForSecondNumber) {
-      this.setState({
-        display: String(number),
-        waitingForSecondNumber: false
-      });
-    } else {
-      this.setState({
-        display: display === '0' ? String(number) : display + number
-      });
-    }
-  };
-
-  handleOperationPress = (operation) => {
-    const { display, firstNumber } = this.state;
-    
-    if (firstNumber && this.state.operation) {
-      this.calculateResult();
-    }
-
-    this.setState({
-      firstNumber: display,
-      operation: operation,
-      waitingForSecondNumber: true
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener("change", ({ window }) => {
+      setDimensions(window);
     });
-  };
 
-  calculateResult = () => {
-    const { firstNumber, display, operation } = this.state;
-    const num1 = parseFloat(firstNumber);
-    const num2 = parseFloat(display);
-    let result = 0;
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
 
-    switch (operation) {
-      case '+':
-        result = num1 + num2;
-        break;
-      case '-':
-        result = num1 - num2;
-        break;
-      case '×':
-        result = num1 * num2;
-        break;
-      case '÷':
-        result = num1 / num2;
-        break;
-    }
+    return () => {
+      subscription.remove();
+      clearTimeout(timer);
+    };
+  }, []);
 
-    this.setState({
-      display: String(result),
-      firstNumber: '',
-      operation: null,
-      waitingForSecondNumber: false
-    });
-  };
-
-  handleClear = () => {
-    this.setState({
-      display: '0',
-      firstNumber: '',
-      operation: null,
-      waitingForSecondNumber: false
-    });
-  };
-
-  render() {
-    return (
-      <View style={styles.container}>
-        <View style={styles.display}>
-          <Text style={styles.displayText}>{this.state.display}</Text>
-        </View>
-        
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.buttonGray} onPress={this.handleClear}>
-            <Text style={styles.buttonText}>AC</Text>
-          </TouchableOpacity>
-          <View style={styles.emptySpace} />
-          <TouchableOpacity 
-            style={styles.buttonOrange} 
-            onPress={() => this.handleOperationPress('÷')}
-          >
-            <Text style={styles.buttonText}>÷</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.buttonRow}>
-          <TouchableOpacity 
-            style={styles.button} 
-            onPress={() => this.handleNumberPress(7)}
-          >
-            <Text style={styles.buttonText}>7</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.button} 
-            onPress={() => this.handleNumberPress(8)}
-          >
-            <Text style={styles.buttonText}>8</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.button} 
-            onPress={() => this.handleNumberPress(9)}
-          >
-            <Text style={styles.buttonText}>9</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.buttonOrange}
-            onPress={() => this.handleOperationPress('×')}
-          >
-            <Text style={styles.buttonText}>×</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.buttonRow}>
-          <TouchableOpacity 
-            style={styles.button}
-            onPress={() => this.handleNumberPress(4)}
-          >
-            <Text style={styles.buttonText}>4</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.button}
-            onPress={() => this.handleNumberPress(5)}
-          >
-            <Text style={styles.buttonText}>5</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.button}
-            onPress={() => this.handleNumberPress(6)}
-          >
-            <Text style={styles.buttonText}>6</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.buttonOrange}
-            onPress={() => this.handleOperationPress('-')}
-          >
-            <Text style={styles.buttonText}>-</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.buttonRow}>
-          <TouchableOpacity 
-            style={styles.button}
-            onPress={() => this.handleNumberPress(1)}
-          >
-            <Text style={styles.buttonText}>1</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.button}
-            onPress={() => this.handleNumberPress(2)}
-          >
-            <Text style={styles.buttonText}>2</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.button}
-            onPress={() => this.handleNumberPress(3)}
-          >
-            <Text style={styles.buttonText}>3</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.buttonOrange}
-            onPress={() => this.handleOperationPress('+')}
-          >
-            <Text style={styles.buttonText}>+</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.buttonRow}>
-          <TouchableOpacity 
-            style={styles.buttonZero}
-            onPress={() => this.handleNumberPress(0)}
-          >
-            <Text style={styles.buttonText}>0</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.button}
-            onPress={() => this.handleNumberPress('.')}
-          >
-            <Text style={styles.buttonText}>.</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.buttonOrange}
-            onPress={this.calculateResult}
-          >
-            <Text style={styles.buttonText}>=</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
+  if (isLoading) {
+    return <SplashScreen />;
   }
-}
+
+  const handlePress = (value) => {
+    if (value === "AC") {
+      setInput("0");
+    } else if (value === "=") {
+      try {
+        // Najpierw formatujemy input, zamieniając wszystkie specjalne znaki
+        let formattedInput = input
+          .replace(/×/g, "*")
+          .replace(/÷/g, "/")
+          .replace(/−/g, "-");
+        
+        // Sprawdzamy czy wyrażenie nie jest puste lub nie zawiera samych operatorów
+        if (!/[0-9]/.test(formattedInput)) {
+          setInput("Error");
+          return;
+        }
+  
+        const result = new Mexp().eval(formattedInput);
+        
+        // Formatujemy wynik, aby uniknąć problemów z długimi liczbami po przecinku
+        const formattedResult = Number.isInteger(result) 
+          ? result.toString()
+          : result.toFixed(8).replace(/\.?0+$/, '');
+        
+        setInput(formattedResult);
+      } catch (error) {
+        setInput("Error");
+      }
+    } else {
+      // Sprawdzamy czy dodajemy operator
+      const isOperator = ["+", "−", "×", "÷"].includes(value);
+      
+      // Jeśli ostatni znak to operator i próbujemy dodać kolejny, zamieniamy operator
+      if (isOperator && ["+", "−", "×", "÷"].includes(input.slice(-1))) {
+        setInput(input.slice(0, -1) + value);
+      }
+      // Jeśli input to "0" i nie dodajemy operatora ani kropki, zamieniamy "0" na nową wartość
+      else if (input === "0" && !isOperator && value !== ".") {
+        setInput(value);
+      }
+      // W przeciwnym razie dodajemy wartość na koniec
+      else {
+        setInput(input + value);
+      }
+    }
+  };
+
+  const buttonConfig = [
+    { title: "AC", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "÷", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "×", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "−", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "+", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "=", backgroundColor: "#ff9a00", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: ".", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "0", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+  ];
+
+  const buttonsPortrait = [
+    ["AC", "", "", "÷"],
+    ["7", "8", "9", "×"],
+    ["4", "5", "6", "−"],
+    ["1", "2", "3", "+"],
+    ["0", ".", "", "="],
+  ];
+
+  const buttonsLandscape = [
+    ["(", ")", "mc", "m+", "m-", "mr", "AC", "+/-", "%", "÷"],
+    ["2ⁿᵈ", "x²", "x³", "xʸ", "eˣ", "10ˣ", "7", "8", "9", "×"],
+    ["¹/ₓ", "√x", "∛x", "ˣ√x", "ln", "log₁₀", "4", "5", "6", "−"],
+    ["x!", "sin", "cos", "tan", "e", "EE", "1", "2", "3", "+"],
+    ["Rad", "sinh", "cosh", "tanh", "π", "Rand", "0", "", ".", "="],
+  ];
+
+  const buttons = dimensions.width > dimensions.height ? buttonsLandscape : buttonsPortrait;
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.result}>
+        <Text style={styles.resultText}>{input}</Text>
+      </View>
+      <View style={styles.buttons}>
+        {buttons.map((row, rowIndex) => (
+          <View style={styles.row} key={rowIndex}>
+            {row.map((button, buttonIndex) => {
+              const isLastInRow = buttonIndex === row.length - 1;
+
+              let config = buttonConfig.find((b) => b.title === button) || {
+                title: button,
+                backgroundColor: "#636466",
+                borderColor: button ? "#555759" : "transparent",
+                color: "#e8e9ea",
+                disabled: button === "",
+              };
+
+              if (isLastInRow && button !== "") {
+                config = {
+                  ...config,
+                  backgroundColor: "#ff9a00",
+                };
+              }
+
+              return (
+                <ButtonComponent
+                  key={buttonIndex}
+                  title={config.title}
+                  backgroundColor={config.backgroundColor}
+                  borderColor={config.borderColor}
+                  color={config.color}
+                  disabled={config.disabled}
+                  onPress={() => handlePress(config.title)}
+                />
+              );
+            })}
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
-    padding: 20,
+    backgroundColor: "#333",
   },
-  display: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
+  result: {
+    flex: 2,
+    justifyContent: "center",
+    alignItems: "flex-end",
+    backgroundColor: "#000",
     padding: 10,
   },
-  displayText: {
-    color: '#ffffff',
-    fontSize: 70,
+  resultText: {
+    fontSize: 48,
+    color: "#fff",
   },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
+  buttons: {
+    flex: 5,
+    backgroundColor: "#444",
+  },
+  row: {
+    flex: 1,
+    flexDirection: "row",
   },
   button: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: '#333333',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonZero: {
-    width: 180,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: '#333333',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    paddingLeft: 30,
-  },
-  buttonGray: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: '#A5A5A5',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonOrange: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: '#FF9F0A',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 0.5,
   },
   buttonText: {
-    color: '#ffffff',
-    fontSize: 30,
-  },
-  emptySpace: {
-    width: 170,
-    height: 80,
-    backgroundColor: '#A5A5A5',
-    borderRadius: 20,
+    fontSize: 28,
+    color: "#fff",
   },
 });
 
-export default Calculator;
+export default App;
