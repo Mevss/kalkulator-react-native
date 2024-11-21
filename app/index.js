@@ -45,43 +45,20 @@ const App = () => {
       setInput("0");
     } else if (value === "=") {
       try {
-        // Najpierw formatujemy input, zamieniając wszystkie specjalne znaki
-        let formattedInput = input
-          .replace(/×/g, "*")
-          .replace(/÷/g, "/")
-          .replace(/−/g, "-");
-        
-        // Sprawdzamy czy wyrażenie nie jest puste lub nie zawiera samych operatorów
-        if (!/[0-9]/.test(formattedInput)) {
-          setInput("Error");
-          return;
-        }
-  
-        const result = new Mexp().eval(formattedInput);
-        
-        // Formatujemy wynik, aby uniknąć problemów z długimi liczbami po przecinku
-        const formattedResult = Number.isInteger(result) 
-          ? result.toString()
-          : result.toFixed(8).replace(/\.?0+$/, '');
-        
-        setInput(formattedResult);
+        const result = new Mexp().eval(
+          input
+            .replace(/×/g, "*")
+            .replace(/÷/g, "/")
+            .replace(/−/g, "-")
+        );
+        setInput(result.toString());
       } catch (error) {
         setInput("Error");
       }
     } else {
-      // Sprawdzamy czy dodajemy operator
-      const isOperator = ["+", "−", "×", "÷"].includes(value);
-      
-      // Jeśli ostatni znak to operator i próbujemy dodać kolejny, zamieniamy operator
-      if (isOperator && ["+", "−", "×", "÷"].includes(input.slice(-1))) {
-        setInput(input.slice(0, -1) + value);
-      }
-      // Jeśli input to "0" i nie dodajemy operatora ani kropki, zamieniamy "0" na nową wartość
-      else if (input === "0" && !isOperator && value !== ".") {
+      if (input === "0" && value !== "+" && value !== "-" && value !== "×" && value !== "÷") {
         setInput(value);
-      }
-      // W przeciwnym razie dodajemy wartość na koniec
-      else {
+      } else {
         setInput(input + value);
       }
     }
