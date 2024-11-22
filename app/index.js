@@ -45,18 +45,13 @@ const App = () => {
       setInput("0");
     } else if (value === "=") {
       try {
-        const result = new Mexp().eval(
-          input
-            .replace(/×/g, "*")
-            .replace(/÷/g, "/")
-            .replace(/−/g, "-")
-        );
+        const result = new Mexp().eval(input);
         setInput(result.toString());
       } catch (error) {
         setInput("Error");
       }
     } else {
-      if (input === "0" && value !== "+" && value !== "-" && value !== "×" && value !== "÷") {
+      if (input === "0" && value !== "+" && value !== "-" && value !== "*" && value !== "/") {
         setInput(value);
       } else {
         setInput(input + value);
@@ -66,27 +61,37 @@ const App = () => {
 
   const buttonConfig = [
     { title: "AC", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
-    { title: "÷", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
-    { title: "×", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
-    { title: "−", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
-    { title: "+", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "/", backgroundColor: "#ff9a00", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "*", backgroundColor: "#ff9a00", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "-", backgroundColor: "#ff9a00", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "+", backgroundColor: "#ff9a00", borderColor: "#555759", color: "#e8e9ea", disabled: false },
     { title: "=", backgroundColor: "#ff9a00", borderColor: "#555759", color: "#e8e9ea", disabled: false },
-    { title: ".", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
-    { title: "0", backgroundColor: "#636466", borderColor: "#555759", color: "#e8e9ea", disabled: false },
-  ];
+    { title: "0", backgroundColor: "#545557", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "1", backgroundColor: "#545557", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "2", backgroundColor: "#545557", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "3", backgroundColor: "#545557", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "4", backgroundColor: "#545557", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "5", backgroundColor: "#545557", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "6", backgroundColor: "#545557", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "7", backgroundColor: "#545557", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "8", backgroundColor: "#545557", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "9", backgroundColor: "#545557", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: ".", backgroundColor: "#545557", borderColor: "#555759", color: "#e8e9ea", disabled: false },
+    { title: "", backgroundColor: "#545557", borderColor: "#555759", color: "#e8e9ea", disabled: true },
+  ];  
 
   const buttonsPortrait = [
-    ["AC", "", "", "÷"],
-    ["7", "8", "9", "×"],
-    ["4", "5", "6", "−"],
+    ["AC", "", "", "/"],
+    ["7", "8", "9", "*"],
+    ["4", "5", "6", "-"],
     ["1", "2", "3", "+"],
     ["0", ".", "", "="],
   ];
 
   const buttonsLandscape = [
-    ["(", ")", "mc", "m+", "m-", "mr", "AC", "+/-", "%", "÷"],
-    ["2ⁿᵈ", "x²", "x³", "xʸ", "eˣ", "10ˣ", "7", "8", "9", "×"],
-    ["¹/ₓ", "√x", "∛x", "ˣ√x", "ln", "log₁₀", "4", "5", "6", "−"],
+    ["(", ")", "mc", "m+", "m-", "mr", "AC", "+/-", "%", "/"],
+    ["2ⁿᵈ", "x²", "x³", "xʸ", "eˣ", "10ˣ", "7", "8", "9", "*"],
+    ["¹/ₓ", "√x", "∛x", "ˣ√x", "ln", "log₁₀", "4", "5", "6", "-"],
     ["x!", "sin", "cos", "tan", "e", "EE", "1", "2", "3", "+"],
     ["Rad", "sinh", "cosh", "tanh", "π", "Rand", "0", "", ".", "="],
   ];
@@ -102,7 +107,6 @@ const App = () => {
         {buttons.map((row, rowIndex) => (
           <View style={styles.row} key={rowIndex}>
             {row.map((button, buttonIndex) => {
-              const isLastInRow = buttonIndex === row.length - 1;
 
               let config = buttonConfig.find((b) => b.title === button) || {
                 title: button,
@@ -111,13 +115,6 @@ const App = () => {
                 color: "#e8e9ea",
                 disabled: button === "",
               };
-
-              if (isLastInRow && button !== "") {
-                config = {
-                  ...config,
-                  backgroundColor: "#ff9a00",
-                };
-              }
 
               return (
                 <ButtonComponent
